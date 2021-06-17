@@ -19,6 +19,9 @@ package com.epam.taskmanager;
 
 import java.util.Scanner;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.epam.taskmanager.constants.Constants;
 import com.epam.taskmanager.exception.TaskException;
 import com.epam.taskmanager.model.User;
@@ -27,6 +30,7 @@ import com.epam.taskmanager.utils.ValidationUtil;
 public class TaskSchedule {
 
 	private final Scanner scan = new Scanner(System.in);
+	private static final Logger LOGGER = LogManager.getLogger(TaskSchedule.class);
 
 	/**
 	 * used for operations on Task
@@ -36,13 +40,13 @@ public class TaskSchedule {
 	public void taskOperation(final User user) {
 		boolean flag = true;
 		do {
-			System.out.println(Constants.SELECT_TASK_OPERATION);
-			System.out.println(Constants._1_NEW_TASK);
-			System.out.println(Constants._2_READ_TASK);
-			System.out.println(Constants._3_DELETE_TASK);
-			System.out.println(Constants._4_UPDATE_TASK);
-			System.out.println(Constants._5_ADD_NOTES);
-			System.out.println(Constants._6_SIGN_OUT);
+			LOGGER.info(Constants.SELECT_TASK_OPERATION);
+			LOGGER.info(Constants._1_NEW_TASK);
+			LOGGER.info(Constants._2_READ_TASK);
+			LOGGER.info(Constants._3_DELETE_TASK);
+			LOGGER.info(Constants._4_UPDATE_TASK);
+			LOGGER.info(Constants._5_ADD_NOTES);
+			LOGGER.info(Constants._6_SIGN_OUT);
 			final String choice = scan.next();
 			try {
 				final int choiceOperation = new ValidationUtil().choiceValidation(choice);
@@ -66,11 +70,11 @@ public class TaskSchedule {
 					flag = !flag;
 					break;
 				default:
-					System.out.println(Constants.WRONG_CHOICE);
+					LOGGER.warn(Constants.WRONG_CHOICE);
 					break;
 				}
 			} catch (final TaskException e) {
-				System.out.println(Constants.RE_ENTER_CHOICE);
+				LOGGER.info(Constants.RE_ENTER_CHOICE);
 			}
 		} while (flag);
 	}

@@ -22,6 +22,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.epam.taskmanager.TaskOperation;
 import com.epam.taskmanager.constants.Constants;
 import com.epam.taskmanager.model.Notes;
@@ -35,6 +38,7 @@ public class TaskServiceImpl implements TaskService {
 	private LocalDateTime taskEndTime;
 	private String taskTitle;
 	private Notes notes;
+	private static final Logger LOGGER = LogManager.getLogger(TaskServiceImpl.class);
 
 	/**
 	 * Create a new Task
@@ -44,7 +48,7 @@ public class TaskServiceImpl implements TaskService {
 	@Override
 	public void newTask(final Task task) {
 		new Task().addTask(task);
-		System.out.println(Constants.TASK_ADDED);
+		LOGGER.info(Constants.TASK_ADDED);
 	}
 
 	/**
@@ -57,16 +61,17 @@ public class TaskServiceImpl implements TaskService {
 		final List<Task> taskList = new Task().getTaskList();
 		final List<Task> userTasks = taskList.stream().filter(task -> user.getUserID() == task.getUserId())
 				.collect(Collectors.toList());
-		System.out.println(
+		LOGGER.info(
 				"----------------------------------------------------------------------------------------------------------");
-		System.out.printf("%10s | %20s  | %20s | %18s | %20s", "Task ID", "Start At", "End At", "Title", "Description");
-		System.out.println();
-		System.out.println(
+		String taskTableHeading = String.format("%10s | %20s  | %20s | %18s | %20s", "Task ID", "Start At", "End At",
+				"Title", "Description");
+		LOGGER.info(taskTableHeading);
+		LOGGER.info(
 				"----------------------------------------------------------------------------------------------------------");
 		if (userTasks.isEmpty()) {
-			System.out.printf("%50s", Constants.NO_TASK_AVAILABLE);
-			System.out.println();
-			System.out.println(
+			String noTaskFound = String.format("%50s", Constants.NO_TASK_AVAILABLE);
+			LOGGER.info(noTaskFound);
+			LOGGER.info(
 					"----------------------------------------------------------------------------------------------------------");
 		} else {
 			userTasks.forEach(task -> printTasks(task));
@@ -81,11 +86,11 @@ public class TaskServiceImpl implements TaskService {
 	private void printTasks(final Task task) {
 		final DateTimeFormatter dateTimeFormate = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 		String taskNotes = printNotes(task.getNotesList());
-		System.out.printf("%10s | %20s  | %20s | %18s | %20s", task.getTaskID(),
+		String taskTableRow = String.format("%10s | %20s  | %20s | %18s | %20s", task.getTaskID(),
 				task.getTaskStartTime().format(dateTimeFormate), task.getTaskEndTime().format(dateTimeFormate),
 				task.getTaskTitle(), taskNotes);
-		System.out.println();
-		System.out.println(
+		LOGGER.info(taskTableRow);
+		LOGGER.info(
 				"----------------------------------------------------------------------------------------------------------");
 	}
 
@@ -106,7 +111,7 @@ public class TaskServiceImpl implements TaskService {
 	public void deleteTask(final User user, final long taskIdToDelete) {
 		final List<Task> t = new Task().getTaskList();
 		t.removeIf(task -> task.getTaskID() == taskIdToDelete);
-		System.out.println(Constants.TASK_REMOVED);
+		LOGGER.info(Constants.TASK_REMOVED);
 	}
 
 	/**
@@ -132,7 +137,7 @@ public class TaskServiceImpl implements TaskService {
 			this.taskStartTime = new TaskOperation().enterStartingTaskTime(updateTaskId);
 			new Task().getTaskList().stream().filter(task -> task.getTaskID() == updateTaskId).findFirst()
 					.ifPresent(updateTask -> updateTask.setTaskStartTime(this.taskStartTime));
-			System.out.println(Constants.TASK_START_TIME_UPDATED);
+			LOGGER.info(Constants.TASK_START_TIME_UPDATED);
 			break;
 		case 2:
 			this.taskEndTime = new TaskOperation().enterEndingingTaskTime(
@@ -141,25 +146,25 @@ public class TaskServiceImpl implements TaskService {
 					updateTaskId);
 			new Task().getTaskList().stream().filter(task -> task.getTaskID() == updateTaskId).findFirst()
 					.ifPresent(updateTask -> updateTask.setTaskEndTime(this.taskEndTime));
-			System.out.println(Constants.TASK_END_TIME_UPDATED);
+			LOGGER.info(Constants.TASK_END_TIME_UPDATED);
 
 			break;
 		case 3:
 			this.taskTitle = new TaskOperation().enterTaskTitle();
 			new Task().getTaskList().stream().filter(task -> task.getTaskID() == updateTaskId).findFirst()
 					.ifPresent(updateTask -> updateTask.setTaskTitle(this.taskTitle));
-			System.out.println(Constants.TASK_TITLE_UPDATED);
+			LOGGER.info(Constants.TASK_TITLE_UPDATED);
 			break;
 		case 4:
 			this.notes = new TaskOperation().enterTaskDescription();
 			new Task().getTaskList().stream().filter(task -> task.getTaskID() == updateTaskId).findFirst()
 					.ifPresent(updateTask -> updateTask.addNotes(notes));
-			System.out.println(Constants.TASK_DESCRIPTION_UPDATED);
+			LOGGER.info(Constants.TASK_DESCRIPTION_UPDATED);
 			break;
 		case 5:
 			break;
 		default:
-			System.out.println(Constants.WRONG_CHOICE);
+			LOGGER.warn(Constants.WRONG_CHOICE);
 			break;
 		}
 	}

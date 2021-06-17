@@ -21,6 +21,9 @@ package com.epam.taskmanager;
 import java.time.LocalDateTime;
 import java.util.Scanner;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.epam.taskmanager.constants.Constants;
 import com.epam.taskmanager.exception.TaskException;
 import com.epam.taskmanager.model.Notes;
@@ -37,6 +40,7 @@ public class TaskOperation {
 	private String taskTitle;
 	private Notes notes;
 	private static Scanner scan = new Scanner(System.in);
+	private static final Logger LOGGER = LogManager.getLogger(TaskOperation.class);
 
 	/**
 	 * create a new Task
@@ -74,7 +78,7 @@ public class TaskOperation {
 	 * used for taking starting time of task
 	 */
 	public LocalDateTime enterStartingTaskTime(final long taskId) {
-		System.out.println(Constants.ENTER_TASK_STARTING_DATE_AND_TIME_FORMATE_YYYY_MM_DD_HH_MM_SS);
+		LOGGER.info(Constants.ENTER_TASK_STARTING_DATE_AND_TIME_FORMATE_YYYY_MM_DD_HH_MM_SS);
 		boolean flag = true;
 		while (flag) {
 			final String taskStartingDate = scan.nextLine();
@@ -91,7 +95,7 @@ public class TaskOperation {
 				}
 				flag = false;
 			} catch (final TaskException e) {
-				System.out.println(Constants.FORMATE_YYYY_MM_DD_HH_MM_SS);
+				LOGGER.info(Constants.FORMATE_YYYY_MM_DD_HH_MM_SS);
 				flag = true;
 			}
 		}
@@ -104,7 +108,7 @@ public class TaskOperation {
 	 * @param taskStartTime
 	 */
 	public LocalDateTime enterEndingingTaskTime(final LocalDateTime taskStartTime, final long taskId) {
-		System.out.println(Constants.ENTER_TASK_ENDING_DATE_AND_TIME_FORMATE_YYYY_MM_DD_HH_MM_SS);
+		LOGGER.info(Constants.ENTER_TASK_ENDING_DATE_AND_TIME_FORMATE_YYYY_MM_DD_HH_MM_SS);
 		boolean flag = true;
 		while (flag) {
 			final String taskEndingingTime = scan.nextLine();
@@ -120,7 +124,7 @@ public class TaskOperation {
 				}
 				flag = false;
 			} catch (final TaskException e) {
-				System.out.println(Constants.FORMATE_YYYY_MM_DD_HH_MM_SS);
+				LOGGER.info(Constants.FORMATE_YYYY_MM_DD_HH_MM_SS);
 				flag = true;
 			}
 		}
@@ -138,7 +142,7 @@ public class TaskOperation {
 	 * used for taking task title
 	 */
 	public String enterTaskTitle() {
-		System.out.println(Constants.TASK_TITLE);
+		LOGGER.info(Constants.TASK_TITLE);
 		final String taskTitle = scan.nextLine();
 		this.taskTitle = taskTitle;
 		return this.taskTitle;
@@ -151,7 +155,7 @@ public class TaskOperation {
 		long notesId = this.generateNotesID();
 		Notes note = new Notes();
 		note.setNotesId(notesId);
-		System.out.println(Constants.TASK_DESCRIPTION);
+		LOGGER.info(Constants.TASK_DESCRIPTION);
 		String taskDescription = "";
 		taskDescription += scan.nextLine();
 		note.setNotesDescription(taskDescription);
@@ -177,9 +181,9 @@ public class TaskOperation {
 	 * @param user
 	 */
 	public void deleteTask(final User user) {
-		System.out.println(Constants.THE_LIST_OF_TASKS_ARE);
+		LOGGER.info(Constants.THE_LIST_OF_TASKS_ARE);
 		readTask(user);
-		System.out.println(Constants.ENTER_TASK_ID_TO_DELETE);
+		LOGGER.info(Constants.ENTER_TASK_ID_TO_DELETE);
 		final String taskId = scan.nextLine();
 		final long taskIdToDelete = new ValidationUtil().taskIDValidation(taskId);
 		if (!isTaskPresent(taskIdToDelete)) {
@@ -189,23 +193,23 @@ public class TaskOperation {
 	}
 
 	public void updateTask(final User user) {
-		System.out.println(Constants.THE_LIST_OF_TASKS_ARE);
+		LOGGER.info(Constants.THE_LIST_OF_TASKS_ARE);
 		readTask(user);
 		if (new Task().getTaskList().isEmpty()) {
 			return;
 		}
-		System.out.println(Constants.ENTER_TASK_ID_TO_UPDATE);
+		LOGGER.info(Constants.ENTER_TASK_ID_TO_UPDATE);
 		final String taskId = scan.nextLine();
 		final long updateTaskId = new ValidationUtil().taskIDValidation(taskId);
 		if (!isTaskPresent(updateTaskId)) {
 			throw new TaskException(Constants.NO_TASK_AVAILABLE_WITH_THIS_ID);
 		}
-		System.out.println(Constants.SELECT_THE_FIELD_WHICH_YOU_WANT_TO_UPDATE);
-		System.out.println(Constants._1_START_TIME);
-		System.out.println(Constants._2_END_TIME);
-		System.out.println(Constants._3_TASK_TITLE);
-		System.out.println(Constants._4_TASK_DESCRIPTION);
-		System.out.println(Constants._5_BACK);
+		LOGGER.info(Constants.SELECT_THE_FIELD_WHICH_YOU_WANT_TO_UPDATE);
+		LOGGER.info(Constants._1_START_TIME);
+		LOGGER.info(Constants._2_END_TIME);
+		LOGGER.info(Constants._3_TASK_TITLE);
+		LOGGER.info(Constants._4_TASK_DESCRIPTION);
+		LOGGER.info(Constants._5_BACK);
 		final int choice = Integer.parseInt(scan.nextLine());
 		new TaskServiceImpl().updateTask(user, updateTaskId, choice);
 	}
@@ -216,18 +220,18 @@ public class TaskOperation {
 	 * @param user
 	 */
 	public void addNotes(final User user) {
-		System.out.println(Constants.THE_LIST_OF_TASKS_ARE);
+		LOGGER.info(Constants.THE_LIST_OF_TASKS_ARE);
 		readTask(user);
 		if (new Task().getTaskList().isEmpty()) {
 			return;
 		}
-		System.out.println(Constants.ENTER_TASK_ID_TO_ADD_NOTES);
+		LOGGER.info(Constants.ENTER_TASK_ID_TO_ADD_NOTES);
 		final String taskId = scan.nextLine();
 		final long updateTaskId = new ValidationUtil().taskIDValidation(taskId);
 		if (!isTaskPresent(updateTaskId)) {
 			throw new TaskException(Constants.NO_TASK_AVAILABLE_WITH_THIS_ID);
 		}
-		System.out.println(Constants.ENTER_NOTES);
+		LOGGER.info(Constants.ENTER_NOTES);
 		long notesId = generateNotesID();
 		final String notesToUpdate = scan.nextLine();
 		Notes note = new Notes();

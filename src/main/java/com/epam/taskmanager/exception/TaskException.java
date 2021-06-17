@@ -17,7 +17,11 @@
 */
 package com.epam.taskmanager.exception;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class TaskException extends RuntimeException {
+	private static final Logger LOGGER = LogManager.getLogger(TaskException.class);
 
 	public TaskException() {
 
@@ -27,6 +31,6 @@ public class TaskException extends RuntimeException {
 	 * @param exception
 	 */
 	public TaskException(final String exception) {
-		System.out.println(exception);
+		LOGGER.error(exception);
 	}
 }
