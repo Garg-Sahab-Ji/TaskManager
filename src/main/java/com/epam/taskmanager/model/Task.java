@@ -1,16 +1,31 @@
+/*
+* Class name: Task
+*
+* Version info: jdk 1.8
+*
+* Copyright notice:
+* 
+* Author info: Arpit Garg
+*
+* Creation date: 15/Jun/2021
+*
+* Last updated By: Arpit Garg
+*
+* Last updated Date: 15/Jun/2021
+*
+* Description: Model Class of Tasks
+*/
 package com.epam.taskmanager.model;
 
-import java.sql.Date;
-import java.sql.Time;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Task {
 
 	private long taskID;
-	private Date taskDate;
-	private Time taskStartTime;
-	private Time taskEndTime;
+	private LocalDateTime taskStartTime;
+	private LocalDateTime taskEndTime;
 	private String taskTitle;
 	private String taskDescription;
 	private long userId;
@@ -32,27 +47,27 @@ public class Task {
 		this.taskID = taskID;
 	}
 
-	public Date getTaskDate() {
-		return taskDate;
-	}
+//	public Date getTaskDate() {
+//		return taskDate;
+//	}
+//
+//	public void setTaskDate(Date taskDate) {
+//		this.taskDate = taskDate;
+//	}
 
-	public void setTaskDate(Date taskDate) {
-		this.taskDate = taskDate;
-	}
-
-	public Time getTaskStartTime() {
+	public LocalDateTime getTaskStartTime() {
 		return taskStartTime;
 	}
 
-	public void setTaskStartTime(Time taskStartTime) {
+	public void setTaskStartTime(LocalDateTime taskStartTime) {
 		this.taskStartTime = taskStartTime;
 	}
 
-	public Time getTaskEndTime() {
+	public LocalDateTime getTaskEndTime() {
 		return taskEndTime;
 	}
 
-	public void setTaskEndTime(Time taskEndTime) {
+	public void setTaskEndTime(LocalDateTime taskEndTime) {
 		this.taskEndTime = taskEndTime;
 	}
 

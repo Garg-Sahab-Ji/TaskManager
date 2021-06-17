@@ -1,3 +1,20 @@
+/*
+* Class name: UserOperation
+*
+* Version info: jdk 1.8
+*
+* Copyright notice:
+* 
+* Author info: Arpit Garg
+*
+* Creation date: 15/Jun/2021
+*
+* Last updated By: Arpit Garg
+*
+* Last updated Date: 15/Jun/2021
+*
+* Description: Used to User signup and login
+*/
 package com.epam.taskmanager;
 
 import java.util.List;
@@ -13,6 +30,9 @@ public class UserOperation {
 
 	private static Scanner scan = new Scanner(System.in);
 
+	/**
+	 * used for user operation
+	 */
 	public void userSelection() {
 		System.out.println(Constants.WELCOME);
 		boolean exitChoice = false;
@@ -21,9 +41,9 @@ public class UserOperation {
 			System.out.println(Constants._2_SIGNUP);
 			System.out.println(Constants._3_EXIT);
 			System.out.println(Constants.ENTER_YOUR_CHOICE);
-			String choice = scan.next();
+			final String choice = scan.next();
 			try {
-				int userChoice = new ValidationUtil().choiceValidation(choice);
+				final int userChoice = new ValidationUtil().choiceValidation(choice);
 				switch (userChoice) {
 				case 1:
 					userLogin();
@@ -33,7 +53,7 @@ public class UserOperation {
 					break;
 				case 3:
 					System.out.println(Constants.PRESS_Y_FOR_EXIT);
-					char ch = scan.next().charAt(0);
+					final char ch = scan.next().charAt(0);
 					if (ch == 'y') {
 						exitChoice = !exitChoice;
 					}
@@ -42,7 +62,7 @@ public class UserOperation {
 					System.out.println(Constants.WRONG_CHOICE);
 					break;
 				}
-			} catch (TaskException e) {
+			} catch (final TaskException e) {
 				System.out.println("Reneter..");
 			}
 
@@ -50,28 +70,34 @@ public class UserOperation {
 		System.out.println(Constants.THANK_YOU);
 	}
 
+	/**
+	 * user login method
+	 */
 	private static void userLogin() {
-		List<User> userList = new User().getUserList();
+		final List<User> userList = new User().getUserList();
 		System.out.println(Constants.ENTER_YOUR_USER_NAME);
-		String userName = scan.next();
+		final String userName = scan.next();
 		System.out.println(Constants.ENTER_YOUR_PASSWORD);
-		String password = scan.next();
-		List<User> loginUser = userList.stream()
+		final String password = scan.next();
+		final List<User> loginUser = userList.stream()
 				.filter(user -> user.getUserName().equals(userName) && user.getPassword().equals(password))
 				.collect(Collectors.toList());
 		if (!loginUser.isEmpty()) {
-			System.out.println("welcome "+loginUser.get(0).getUserName());
+			System.out.println("welcome " + loginUser.get(0).getUserName());
 			new TaskSchedule().taskOperation(loginUser.get(0));
 		}
 	}
 
+	/**
+	 * User signup
+	 */
 	private static void userRegistration() {
-		long userId = (long) (Math.random() * 1000);
+		final long userId = (long) (Math.random() * 1000);
 		System.out.println(Constants.ENTER_YOUR_USER_NAME);
-		String userName = scan.next();
+		final String userName = scan.next();
 		System.out.println(Constants.ENTER_YOUR_PASSWORD);
-		String password = scan.next();
-		User user = new User();
+		final String password = scan.next();
+		final User user = new User();
 		user.setUserID(userId);
 		user.setUserName(userName);
 		user.setPassword(password);

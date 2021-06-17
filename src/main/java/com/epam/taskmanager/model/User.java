@@ -1,3 +1,20 @@
+/*
+* Class name: User
+*
+* Version info: jdk 1.8
+*
+* Copyright notice:
+* 
+* Author info: Arpit Garg
+*
+* Creation date: 15/Jun/2021
+*
+* Last updated By: Arpit Garg
+*
+* Last updated Date: 15/Jun/2021
+*
+* Description: Model class of user
+*/
 package com.epam.taskmanager.model;
 
 import java.util.ArrayList;

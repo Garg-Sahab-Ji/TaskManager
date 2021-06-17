@@ -1,131 +1,70 @@
+/*
+* Class name: TaskServiceImpl
+*
+* Version info: jdk 1.8
+*
+* Copyright notice:
+* 
+* Author info: Arpit Garg
+*
+* Creation date: 15/Jun/2021
+*
+* Last updated By: Arpit Garg
+*
+* Last updated Date: 15/Jun/2021
+*
+* Description: Used to perform operation on Tasks
+*/
 package com.epam.taskmanager.service.impl;
 
-import java.sql.Date;
-import java.sql.Time;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 
-import com.epam.taskmanager.exception.TaskException;
+import com.epam.taskmanager.TaskOperation;
+import com.epam.taskmanager.constants.Constants;
 import com.epam.taskmanager.model.Task;
 import com.epam.taskmanager.model.User;
 import com.epam.taskmanager.service.TaskService;
-import com.epam.taskmanager.utils.ValidationUtil;
 
 public class TaskServiceImpl implements TaskService {
-	private long taskId;
-	private Date taskDate;
-	private Time taskStartTime;
-	private Time taskEndTime;
+
+	private LocalDateTime taskStartTime;
+	private LocalDateTime taskEndTime;
 	private String taskTitle;
 	private String taskDescription;
-	private static Scanner scan = new Scanner(System.in);
 
+	/**
+	 * Create a new Task
+	 * 
+	 * @param user
+	 */
 	@Override
-	public void newTask(User user) {
-		taskId();
-		enterTaskDate();
-		enterStartingTaskTime();
-		enterEndingingTaskTime();
-		enterTaskTitle();
-		enterTaskDescription();
-		Task task = new Task();
-		task.setTaskID(this.taskId);
-		task.setTaskDate(this.taskDate);
-		task.setTaskStartTime(this.taskStartTime);
-		task.setTaskEndTime(this.taskEndTime);
-		task.setTaskTitle(this.taskTitle);
-		task.setTaskDescription(this.taskDescription);
-		task.setUserId(user.getUserID());
+	public void newTask(final Task task) {
 		new Task().addTask(task);
+		System.out.println(Constants.TASK_ADDED);
 	}
 
-	private void taskId() {
-		this.taskId = (long) (Math.random() * 1000);
-	}
-
-	private void enterTaskDate() {
-		System.out.println("Enter Task Date: \nFormate: YYYY-MM-DD");
-		boolean flag = true;
-		while (flag) {
-			String taskDate = scan.nextLine();
-			try {
-				new ValidationUtil().dateValidation(taskDate);
-				this.taskDate = Date.valueOf(taskDate);
-				Date todayDate = new java.sql.Date(System.currentTimeMillis());
-				if (this.taskDate.before(todayDate)) {
-					throw new TaskException("Enter Future Date");
-				}
-				System.out.println(Date.valueOf(taskDate));
-				flag = false;
-			} catch (TaskException e) {
-				System.out.println("Formate: YYYY-MM-DD");
-				flag = true;
-			}
-		}
-	}
-
-	private void enterStartingTaskTime() {
-		System.out.println("Enter Task Time: \nFormate: HH:MM:SS");
-		boolean flag = true;
-		while (flag) {
-			String taskStartingTime = scan.nextLine();
-			try {
-				new ValidationUtil().timeValidation(taskStartingTime);
-				this.taskStartTime = Time.valueOf(taskStartingTime);
-				System.out.println(Time.valueOf(taskStartingTime));
-				flag = false;
-			} catch (TaskException e) {
-				System.out.println("Formate: HH:MM:SS");
-				flag = true;
-			}
-		}
-	}
-
-	private void enterEndingingTaskTime() {
-		System.out.println("Enter Task Time: \nFormate: HH:MM:SS");
-		boolean flag = true;
-		while (flag) {
-			String taskEndingingTime = scan.nextLine();
-			try {
-				new ValidationUtil().timeValidation(taskEndingingTime);
-				this.taskEndTime = Time.valueOf(taskEndingingTime);
-				if (this.taskEndTime.before(this.taskStartTime)) {
-					throw new TaskException("Ending time must be after starting time");
-				}
-				System.out.println(Time.valueOf(taskEndingingTime));
-				flag = false;
-			} catch (TaskException e) {
-				System.out.println("Formate: HH:MM:SS");
-				flag = true;
-			}
-		}
-	}
-
-	private void enterTaskTitle() {
-		System.out.println("Task Title: ");
-		String taskTitle = scan.nextLine();
-		this.taskTitle = taskTitle;
-	}
-
-	private void enterTaskDescription() {
-		System.out.println("Task Description: ");
-		String taskDescription = scan.nextLine();
-		this.taskDescription = taskDescription;
-	}
-
+	/**
+	 * used for read list of task
+	 * 
+	 * @param user
+	 */
 	@Override
-	public void readTask(User user) {
-		List<Task> taskList = new Task().getTaskList();
-		List<Task> userTasks = taskList.stream().filter(task -> user.getUserID() == task.getUserId())
+	public void readTask(final User user) {
+		final List<Task> taskList = new Task().getTaskList();
+		final List<Task> userTasks = taskList.stream().filter(task -> user.getUserID() == task.getUserId())
 				.collect(Collectors.toList());
 		System.out.println(
 				"----------------------------------------------------------------------------------------------------------");
-		System.out.printf("%10s | %10s | %10s | %10s | %15s | %15s", "Task ID", "Dete", "Start", "End", "Title",
-				"Description");
+		System.out.printf("%10s | %18s | %18s | %15s | %15s", "Task ID", "Start At", "End At", "Title", "Description");
 		System.out.println();
+		System.out.println(
+				"----------------------------------------------------------------------------------------------------------");
 		if (userTasks.isEmpty()) {
-			System.out.println("No Task Available");
+			System.out.printf("%50s", Constants.NO_TASK_AVAILABLE);
+			System.out.println();
 			System.out.println(
 					"----------------------------------------------------------------------------------------------------------");
 		} else {
@@ -133,16 +72,85 @@ public class TaskServiceImpl implements TaskService {
 		}
 	}
 
-	private void printTasks(Task task) {
-		System.out.printf("%10s | %10s | %10s | %10s | %15s | %15s", task.getTaskID(), task.getTaskDate(),
-				task.getTaskStartTime(), task.getTaskEndTime(), task.getTaskTitle(), task.getTaskDescription());
+	/**
+	 * print the task
+	 * 
+	 * @param task
+	 */
+	private void printTasks(final Task task) {
+		final DateTimeFormatter dateTimeFormate = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+		System.out.printf("%10s | %18s  | %18s | %15s | %15s", task.getTaskID(),
+				task.getTaskStartTime().format(dateTimeFormate), task.getTaskEndTime().format(dateTimeFormate),
+				task.getTaskTitle(), task.getTaskDescription());
 		System.out.println();
 		System.out.println(
 				"----------------------------------------------------------------------------------------------------------");
 	}
 
+	/**
+	 * used to delete a task
+	 * 
+	 * @param user
+	 */
 	@Override
-	public void deleteTask(User user) {
-		
+	public void deleteTask(final User user, final long taskIdToDelete) {
+		final List<Task> t = new Task().getTaskList();
+		t.removeIf(task -> task.getTaskID() == taskIdToDelete);
+		System.out.println(Constants.TASK_REMOVED);
+	}
+
+	/**
+	 * used to add a notes
+	 * 
+	 * @param user
+	 */
+	@Override
+	public void addNotes(final User user, final long updateTaskId, final String notesToUpdate) {
+		new Task().getTaskList().stream().filter(task -> task.getTaskID() == updateTaskId).findFirst().ifPresent(
+				updateTask -> updateTask.setTaskDescription(updateTask.getTaskDescription() + "," + notesToUpdate));
+	}
+
+	/**
+	 * used to update a task
+	 * 
+	 * @param user
+	 */
+	@Override
+	public void updateTask(final User user, final long updateTaskId, final int choice) {
+		switch (choice) {
+		case 1:
+			this.taskStartTime = new TaskOperation().enterStartingTaskTime(updateTaskId);
+			new Task().getTaskList().stream().filter(task -> task.getTaskID() == updateTaskId).findFirst()
+					.ifPresent(updateTask -> updateTask.setTaskStartTime(this.taskStartTime));
+			System.out.println(Constants.TASK_START_TIME_UPDATED);
+			break;
+		case 2:
+			this.taskEndTime = new TaskOperation().enterEndingingTaskTime(
+					new Task().getTaskList().stream().filter(task -> task.getTaskID() == updateTaskId)
+							.collect(Collectors.toList()).get(0).getTaskStartTime(),
+					updateTaskId);
+			new Task().getTaskList().stream().filter(task -> task.getTaskID() == updateTaskId).findFirst()
+					.ifPresent(updateTask -> updateTask.setTaskEndTime(this.taskEndTime));
+			System.out.println(Constants.TASK_END_TIME_UPDATED);
+
+			break;
+		case 3:
+			this.taskTitle = new TaskOperation().enterTaskTitle();
+			new Task().getTaskList().stream().filter(task -> task.getTaskID() == updateTaskId).findFirst()
+					.ifPresent(updateTask -> updateTask.setTaskTitle(this.taskTitle));
+			System.out.println(Constants.TASK_TITLE_UPDATED);
+			break;
+		case 4:
+			this.taskDescription = new TaskOperation().enterTaskDescription();
+			new Task().getTaskList().stream().filter(task -> task.getTaskID() == updateTaskId).findFirst()
+					.ifPresent(updateTask -> updateTask.setTaskDescription(this.taskDescription));
+			System.out.println(Constants.TASK_DESCRIPTION_UPDATED);
+			break;
+		case 5:
+			break;
+		default:
+			System.out.println(Constants.WRONG_CHOICE);
+			break;
+		}
 	}
 }
