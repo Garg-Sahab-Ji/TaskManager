@@ -17,6 +17,7 @@
 */
 package com.epam.taskmanager.service;
 
+import com.epam.taskmanager.model.Notes;
 import com.epam.taskmanager.model.Task;
 import com.epam.taskmanager.model.User;
 
@@ -47,7 +48,7 @@ public interface TaskService {
 	 * 
 	 * @param user
 	 */
-	public void addNotes(User user, long updateTaskId, String notesToUpdate);
+	public void addNotes(User user, long updateTaskId, Notes note);
 
 	/**
 	 * Update a Task

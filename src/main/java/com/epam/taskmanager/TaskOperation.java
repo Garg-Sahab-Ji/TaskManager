@@ -23,6 +23,7 @@ import java.util.Scanner;
 
 import com.epam.taskmanager.constants.Constants;
 import com.epam.taskmanager.exception.TaskException;
+import com.epam.taskmanager.model.Notes;
 import com.epam.taskmanager.model.Task;
 import com.epam.taskmanager.model.User;
 import com.epam.taskmanager.service.impl.TaskServiceImpl;
@@ -34,7 +35,7 @@ public class TaskOperation {
 	private LocalDateTime taskStartTime;
 	private LocalDateTime taskEndTime;
 	private String taskTitle;
-	private String taskDescription;
+	private Notes notes;
 	private static Scanner scan = new Scanner(System.in);
 
 	/**
@@ -43,17 +44,17 @@ public class TaskOperation {
 	 * @param user
 	 */
 	public void newTask(final User user) {
-		this.taskId = taskId();
+		this.taskId = generateTaskId();
 		this.taskStartTime = enterStartingTaskTime(this.taskId);
 		this.taskEndTime = enterEndingingTaskTime(this.taskStartTime, this.taskId);
 		this.taskTitle = enterTaskTitle();
-		this.taskDescription = enterTaskDescription();
+		this.notes = enterTaskDescription();
 		final Task task = new Task();
 		task.setTaskID(this.taskId);
 		task.setTaskStartTime(this.taskStartTime);
 		task.setTaskEndTime(this.taskEndTime);
 		task.setTaskTitle(this.taskTitle);
-		task.setTaskDescription(this.taskDescription);
+		task.addNotes(notes);
 		task.setUserId(user.getUserID());
 		new TaskServiceImpl().newTask(task);
 	}
@@ -61,14 +62,18 @@ public class TaskOperation {
 	/**
 	 * Generate a unique Task Id
 	 */
-	private long taskId() {
+	private long generateTaskId() {
 		return (long) (Math.random() * 1000);
+	}
+
+	private long generateNotesID() {
+		return (long) (Math.random() * 10000);
 	}
 
 	/**
 	 * used for taking starting time of task
 	 */
-	public LocalDateTime enterStartingTaskTime(long taskId) {
+	public LocalDateTime enterStartingTaskTime(final long taskId) {
 		System.out.println(Constants.ENTER_TASK_STARTING_DATE_AND_TIME_FORMATE_YYYY_MM_DD_HH_MM_SS);
 		boolean flag = true;
 		while (flag) {
@@ -98,7 +103,7 @@ public class TaskOperation {
 	 * 
 	 * @param taskStartTime
 	 */
-	public LocalDateTime enterEndingingTaskTime(final LocalDateTime taskStartTime, long taskId) {
+	public LocalDateTime enterEndingingTaskTime(final LocalDateTime taskStartTime, final long taskId) {
 		System.out.println(Constants.ENTER_TASK_ENDING_DATE_AND_TIME_FORMATE_YYYY_MM_DD_HH_MM_SS);
 		boolean flag = true;
 		while (flag) {
@@ -122,9 +127,11 @@ public class TaskOperation {
 		return this.taskEndTime;
 	}
 
-	private boolean timeConflict(final LocalDateTime dateTime, long taskId) {
-		return new Task().getTaskList().stream().anyMatch(task -> ((task.getTaskStartTime().isBefore(dateTime)
-				&& task.getTaskEndTime().isAfter(dateTime))|| (task.getTaskStartTime().isEqual(dateTime)|| task.getTaskEndTime().isEqual(dateTime)))&& task.getTaskID() != taskId);
+	private boolean timeConflict(final LocalDateTime dateTime, final long taskId) {
+		return new Task().getTaskList().stream().anyMatch(
+				task -> ((task.getTaskStartTime().isBefore(dateTime) && task.getTaskEndTime().isAfter(dateTime))
+						|| (task.getTaskStartTime().isEqual(dateTime) || task.getTaskEndTime().isEqual(dateTime)))
+						&& task.getTaskID() != taskId);
 	}
 
 	/**
@@ -140,12 +147,15 @@ public class TaskOperation {
 	/**
 	 * used for taking task notes/description
 	 */
-	public String enterTaskDescription() {
+	public Notes enterTaskDescription() {
+		long notesId = this.generateNotesID();
+		Notes note = new Notes();
+		note.setNotesId(notesId);
 		System.out.println(Constants.TASK_DESCRIPTION);
 		String taskDescription = "";
 		taskDescription += scan.nextLine();
-		this.taskDescription = taskDescription;
-		return this.taskDescription;
+		note.setNotesDescription(taskDescription);
+		return note;
 	}
 
 	/**
@@ -155,6 +165,10 @@ public class TaskOperation {
 	 */
 	public void readTask(final User user) {
 		new TaskServiceImpl().readTask(user);
+	}
+
+	private boolean isTaskPresent(long taskId) {
+		return new Task().getTaskList().stream().anyMatch(task -> task.getTaskID() == taskId);
 	}
 
 	/**
@@ -168,6 +182,9 @@ public class TaskOperation {
 		System.out.println(Constants.ENTER_TASK_ID_TO_DELETE);
 		final String taskId = scan.nextLine();
 		final long taskIdToDelete = new ValidationUtil().taskIDValidation(taskId);
+		if (!isTaskPresent(taskIdToDelete)) {
+			throw new TaskException(Constants.NO_TASK_AVAILABLE_WITH_THIS_ID);
+		}
 		new TaskServiceImpl().deleteTask(user, taskIdToDelete);
 	}
 
@@ -180,6 +197,9 @@ public class TaskOperation {
 		System.out.println(Constants.ENTER_TASK_ID_TO_UPDATE);
 		final String taskId = scan.nextLine();
 		final long updateTaskId = new ValidationUtil().taskIDValidation(taskId);
+		if (!isTaskPresent(updateTaskId)) {
+			throw new TaskException(Constants.NO_TASK_AVAILABLE_WITH_THIS_ID);
+		}
 		System.out.println(Constants.SELECT_THE_FIELD_WHICH_YOU_WANT_TO_UPDATE);
 		System.out.println(Constants._1_START_TIME);
 		System.out.println(Constants._2_END_TIME);
@@ -204,8 +224,15 @@ public class TaskOperation {
 		System.out.println(Constants.ENTER_TASK_ID_TO_ADD_NOTES);
 		final String taskId = scan.nextLine();
 		final long updateTaskId = new ValidationUtil().taskIDValidation(taskId);
+		if (!isTaskPresent(updateTaskId)) {
+			throw new TaskException(Constants.NO_TASK_AVAILABLE_WITH_THIS_ID);
+		}
 		System.out.println(Constants.ENTER_NOTES);
+		long notesId = generateNotesID();
 		final String notesToUpdate = scan.nextLine();
-		new TaskServiceImpl().addNotes(user, updateTaskId, notesToUpdate);
+		Notes note = new Notes();
+		note.setNotesId(notesId);
+		note.setNotesDescription(notesToUpdate);
+		new TaskServiceImpl().addNotes(user, updateTaskId, note);
 	}
 }

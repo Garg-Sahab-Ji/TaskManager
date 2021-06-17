@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 import com.epam.taskmanager.TaskOperation;
 import com.epam.taskmanager.constants.Constants;
+import com.epam.taskmanager.model.Notes;
 import com.epam.taskmanager.model.Task;
 import com.epam.taskmanager.model.User;
 import com.epam.taskmanager.service.TaskService;
@@ -33,7 +34,7 @@ public class TaskServiceImpl implements TaskService {
 	private LocalDateTime taskStartTime;
 	private LocalDateTime taskEndTime;
 	private String taskTitle;
-	private String taskDescription;
+	private Notes notes;
 
 	/**
 	 * Create a new Task
@@ -58,7 +59,7 @@ public class TaskServiceImpl implements TaskService {
 				.collect(Collectors.toList());
 		System.out.println(
 				"----------------------------------------------------------------------------------------------------------");
-		System.out.printf("%10s | %18s | %18s | %15s | %15s", "Task ID", "Start At", "End At", "Title", "Description");
+		System.out.printf("%10s | %20s  | %20s | %18s | %20s", "Task ID", "Start At", "End At", "Title", "Description");
 		System.out.println();
 		System.out.println(
 				"----------------------------------------------------------------------------------------------------------");
@@ -79,12 +80,21 @@ public class TaskServiceImpl implements TaskService {
 	 */
 	private void printTasks(final Task task) {
 		final DateTimeFormatter dateTimeFormate = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-		System.out.printf("%10s | %18s  | %18s | %15s | %15s", task.getTaskID(),
+		String taskNotes = printNotes(task.getNotesList());
+		System.out.printf("%10s | %20s  | %20s | %18s | %20s", task.getTaskID(),
 				task.getTaskStartTime().format(dateTimeFormate), task.getTaskEndTime().format(dateTimeFormate),
-				task.getTaskTitle(), task.getTaskDescription());
+				task.getTaskTitle(), taskNotes);
 		System.out.println();
 		System.out.println(
 				"----------------------------------------------------------------------------------------------------------");
+	}
+
+	private String printNotes(List<Notes> notes) {
+		String notesDescription = "";
+		for (Notes note : notes) {
+			notesDescription += note.getNotesDescription() + "\n";
+		}
+		return notesDescription;
 	}
 
 	/**
@@ -105,9 +115,9 @@ public class TaskServiceImpl implements TaskService {
 	 * @param user
 	 */
 	@Override
-	public void addNotes(final User user, final long updateTaskId, final String notesToUpdate) {
-		new Task().getTaskList().stream().filter(task -> task.getTaskID() == updateTaskId).findFirst().ifPresent(
-				updateTask -> updateTask.setTaskDescription(updateTask.getTaskDescription() + "," + notesToUpdate));
+	public void addNotes(final User user, final long updateTaskId, final Notes notes) {
+		new Task().getTaskList().stream().filter(task -> task.getTaskID() == updateTaskId).findFirst()
+				.ifPresent(updateTask -> updateTask.addNotes(notes));
 	}
 
 	/**
@@ -141,9 +151,9 @@ public class TaskServiceImpl implements TaskService {
 			System.out.println(Constants.TASK_TITLE_UPDATED);
 			break;
 		case 4:
-			this.taskDescription = new TaskOperation().enterTaskDescription();
+			this.notes = new TaskOperation().enterTaskDescription();
 			new Task().getTaskList().stream().filter(task -> task.getTaskID() == updateTaskId).findFirst()
-					.ifPresent(updateTask -> updateTask.setTaskDescription(this.taskDescription));
+					.ifPresent(updateTask -> updateTask.addNotes(notes));
 			System.out.println(Constants.TASK_DESCRIPTION_UPDATED);
 			break;
 		case 5:

@@ -27,7 +27,7 @@ public class Task {
 	private LocalDateTime taskStartTime;
 	private LocalDateTime taskEndTime;
 	private String taskTitle;
-	private String taskDescription;
+	private List<Notes> notesList = new ArrayList<Notes>();
 	private long userId;
 	private static List<Task> taskList = new ArrayList<Task>();
 
@@ -46,14 +46,6 @@ public class Task {
 	public void setTaskID(long taskID) {
 		this.taskID = taskID;
 	}
-
-//	public Date getTaskDate() {
-//		return taskDate;
-//	}
-//
-//	public void setTaskDate(Date taskDate) {
-//		this.taskDate = taskDate;
-//	}
 
 	public LocalDateTime getTaskStartTime() {
 		return taskStartTime;
@@ -79,19 +71,19 @@ public class Task {
 		this.taskTitle = taskTitle;
 	}
 
-	public String getTaskDescription() {
-		return taskDescription;
-	}
-
-	public void setTaskDescription(String taskDescription) {
-		this.taskDescription = taskDescription;
-	}
-
 	public void addTask(Task task) {
 		taskList.add(task);
 	}
 
 	public List<Task> getTaskList() {
 		return taskList;
+	}
+
+	public void addNotes(Notes notes) {
+		this.notesList.add(notes);
+	}
+
+	public List<Notes> getNotesList() {
+		return notesList;
 	}
 }
